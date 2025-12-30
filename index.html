@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#2d3142">
     <title>Sip Track - Beverage Tracker</title>
     <link rel="manifest" href="manifest.json">
@@ -11,8 +11,8 @@
 <body>
     <div class="container">
         <header>
-            <h1>☕ Sip Track</h1>
-            <p class="subtitle">Track your daily beverages</p>
+            <h1>Drink Tracker</h1>
+            <p class="subtitle">Track your beverages</p>
         </header>
 
         <main>
@@ -30,40 +30,122 @@
                             <label for="drink-type">Drink Type</label>
                             <select id="drink-type" required>
                                 <option value="">Select a drink...</option>
-                                <option value="coffee">☕ Coffee</option>
-                                <option value="matcha">🍵 Matcha</option>
                                 <option value="boba">🧋 Boba</option>
-                                <option value="tea">🫖 Tea</option>
+                                <option value="energy-drink">⚡️ Energy Drink</option>
+                                <option value="matcha">🍵 Matcha</option>
+                                <option value="coffee">☕️ Coffee</option>  
+                                <option value="other">🍹 Other</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="drink-size">Size</label>
-                            <select id="drink-size" required>
-                                <option value="">Select size...</option>
-                                <option value="small">Small (8-12 oz)</option>
-                                <option value="medium">Medium (12-16 oz)</option>
-                                <option value="large">Large (16-24 oz)</option>
-                                <option value="xlarge">Extra Large (24+ oz)</option>
-                            </select>
+                        <!-- Fields for boba, matcha, coffee, other -->
+                        <div class="form-group conditional-field" id="place-field" style="display: none;">
+                            <label for="drink-place">Place</label>
+                            <input 
+                                type="text" 
+                                id="drink-place" 
+                                list="places-list" 
+                                placeholder="Enter place name..."
+                                autocomplete="off"
+                            />
+                            <datalist id="places-list"></datalist>
                         </div>
 
-                        <button type="submit" class="btn-primary">Add Drink</button>
+                        <div class="form-group conditional-field" id="item-field" style="display: none;">
+                            <label for="drink-item">Drink</label>
+                            <input 
+                                type="text" 
+                                id="drink-item" 
+                                list="items-list" 
+                                placeholder="What did you get?"
+                                autocomplete="off"
+                            />
+                            <datalist id="items-list"></datalist>
+                        </div>
+
+                        <!-- Fields for energy drink -->
+                        <div class="form-group conditional-field" id="brand-field" style="display: none;">
+                            <label for="drink-brand">Brand</label>
+                            <input 
+                                type="text" 
+                                id="drink-brand" 
+                                list="brands-list" 
+                                placeholder="Enter brand name..."
+                                autocomplete="off"
+                            />
+                            <datalist id="brands-list"></datalist>
+                        </div>
+
+                        <div class="form-group conditional-field" id="flavor-field" style="display: none;">
+                            <label for="drink-flavor">Flavor</label>
+                            <input 
+                                type="text" 
+                                id="drink-flavor" 
+                                list="flavors-list" 
+                                placeholder="Enter flavor..."
+                                autocomplete="off"
+                            />
+                            <datalist id="flavors-list"></datalist>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="submit-btn" style="display: none;">Add Drink</button>
                     </form>
                 </section>
             </div>
 
             <div class="tab-content" id="stats-tab">
                 <section class="stats-section">
-                    <h2>Today's Stats</h2>
+                    <div class="stats-header">
+                        <h2>Stats</h2>
+                        <div class="year-selector">
+                            <label for="year-select">Year:</label>
+                            <select id="year-select" class="year-select">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-number" id="today-count">0</div>
-                            <div class="stat-label">Drinks Today</div>
+                            <div class="stat-number" id="boba-count">0</div>
+                            <div class="stat-label">🧋 Boba</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-number" id="total-count">0</div>
-                            <div class="stat-label">Total Logged</div>
+                            <div class="stat-number" id="coffee-count">0</div>
+                            <div class="stat-label">☕ Coffee</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="matcha-count">0</div>
+                            <div class="stat-label">🍵 Matcha</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="energy-drink-count">0</div>
+                            <div class="stat-label">⚡️ Energy Drink</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="other-count">0</div>
+                            <div class="stat-label">🍹 Other</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-charts">
+                        <div class="chart-container">
+                            <h3>Drink Types Distribution</h3>
+                            <canvas id="drink-type-chart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>Monthly Breakdown</h3>
+                            <canvas id="monthly-chart"></canvas>
+                        </div>
+
+                        <div class="monthly-stats" id="monthly-stats-container">
+                            <h3>Monthly Details</h3>
+                            <div id="monthly-breakdown"></div>
+                        </div>
+
+                        <div class="chart-container" id="top-places-container" style="display: none;">
+                            <h3>Top Places</h3>
+                            <div id="top-places-list"></div>
                         </div>
                     </div>
                 </section>
@@ -80,6 +162,7 @@
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

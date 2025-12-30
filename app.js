@@ -621,8 +621,38 @@ function updateTopPlaces(drinks) {
     }).join('');
 }
 
-// Analyze drinks by month
+// Analyze drinks by month (boba only)
 function getDrinksByMonth(drinks) {
+    const monthData = {};
+    
+    // Filter for boba drinks only
+    const bobaDrinks = drinks.filter(drink => drink.type === 'boba');
+    
+    bobaDrinks.forEach(drink => {
+        const date = new Date(drink.timestamp);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        
+        if (!monthData[monthKey]) {
+            monthData[monthKey] = {
+                label: monthLabel,
+                count: 0,
+                types: {}
+            };
+        }
+        
+        monthData[monthKey].count++;
+        
+        const type = drink.type === 'energy-drink' ? 'Energy Drink' : 
+                     drink.type.charAt(0).toUpperCase() + drink.type.slice(1);
+        monthData[monthKey].types[type] = (monthData[monthKey].types[type] || 0) + 1;
+    });
+    
+    return monthData;
+}
+
+// Analyze ALL drinks by month (for monthly details section)
+function getAllDrinksByMonth(drinks) {
     const monthData = {};
     
     drinks.forEach(drink => {
@@ -715,6 +745,7 @@ function updateDrinkTypeChart(drinks) {
 
 // Create/update monthly bar chart
 function updateMonthlyChart(drinks) {
+    const selectedYear = parseInt(document.getElementById('year-select').value);
     const monthData = getDrinksByMonth(drinks);
     const ctx = document.getElementById('monthly-chart');
     
@@ -722,8 +753,17 @@ function updateMonthlyChart(drinks) {
     
     // Sort months chronologically
     const sortedMonths = Object.keys(monthData).sort();
-    const labels = sortedMonths.map(key => monthData[key].label);
-    const data = sortedMonths.map(key => monthData[key].count);
+    
+    // Filter for selected year only
+    const yearMonths = sortedMonths.filter(monthKey => {
+        const year = parseInt(monthKey.split('-')[0]);
+        return year === selectedYear;
+    });
+    
+    // Get last 12 months (or all months if less than 12)
+    const last12Months = yearMonths.slice(-12);
+    const labels = last12Months.map(key => monthData[key].label);
+    const data = last12Months.map(key => monthData[key].count);
     
     if (monthlyChart) {
         monthlyChart.destroy();
@@ -743,6 +783,7 @@ function updateMonthlyChart(drinks) {
             }]
         },
         options: {
+            indexAxis: 'y', // This makes the bar chart horizontal
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
@@ -752,16 +793,23 @@ function updateMonthlyChart(drinks) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.parsed.y} drinks`;
+                            return `${context.parsed.x} drinks`;
                         }
                     }
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
                     }
                 }
             }
@@ -771,7 +819,8 @@ function updateMonthlyChart(drinks) {
 
 // Create monthly breakdown cards
 function updateMonthlyBreakdown(drinks) {
-    const monthData = getDrinksByMonth(drinks);
+    const selectedYear = parseInt(document.getElementById('year-select').value);
+    const monthData = getAllDrinksByMonth(drinks); // Use all drinks
     const container = document.getElementById('monthly-breakdown');
     
     if (!container) return;
@@ -784,7 +833,18 @@ function updateMonthlyBreakdown(drinks) {
     // Sort months chronologically (newest first)
     const sortedMonths = Object.keys(monthData).sort().reverse();
     
-    container.innerHTML = sortedMonths.map(monthKey => {
+    // Filter for selected year only
+    const filteredMonths = sortedMonths.filter(monthKey => {
+        const year = parseInt(monthKey.split('-')[0]);
+        return year === selectedYear;
+    });
+    
+    if (filteredMonths.length === 0) {
+        container.innerHTML = '<p class="empty-state">No data for this year.</p>';
+        return;
+    }
+    
+    container.innerHTML = filteredMonths.map(monthKey => {
         const month = monthData[monthKey];
         const typeDetails = Object.entries(month.types)
             .map(([type, count]) => `<span class="month-stat-item"><strong>${type}:</strong> ${count}</span>`)
@@ -819,4 +879,3 @@ function formatDate(date) {
         year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
     });
 }
-

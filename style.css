@@ -337,7 +337,7 @@ main {
 }
 
 .chart-container canvas {
-    max-height: 300px;
+    max-height: 400px;
 }
 
 .monthly-stats {
@@ -657,4 +657,3 @@ main {
         opacity: 1;
     }
 }
-

@@ -1,6 +1,6 @@
 {
-  "name": "Sip Track - Beverage Tracker",
-  "short_name": "Sip Track",
+  "name": "Drink Tracker",
+  "short_name": "Tracker",
   "description": "Track your daily beverages including coffee, boba, matcha, energy drinks, and more",
   "start_url": "/",
   "display": "standalone",

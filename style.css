@@ -173,6 +173,7 @@ main {
     border-radius: 10px;
     font-size: 1rem;
     background: white;
+    color: #333;
     cursor: pointer;
     transition: border-color 0.2s ease;
     -webkit-appearance: none;
@@ -184,6 +185,10 @@ main {
 .form-group select:focus {
     outline: none;
     border-color: #8B7355;
+}
+
+.form-group select option {
+    color: #333;
 }
 
 .form-group input[type="text"] {

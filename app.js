@@ -703,13 +703,13 @@ function updateDrinkTypeChart(drinks) {
     const labels = Object.keys(typeCounts);
     const data = Object.values(typeCounts);
     
-    // Color palette
+    // Color palette - brown/neutral tones
     const colors = {
-        'Coffee': '#2563eb',
-        'Boba': '#1e40af',
-        'Matcha': '#3b82f6',
-        'Energy Drink': '#60a5fa',
-        'Other': '#93c5fd'
+        'Coffee': '#8B7355',
+        'Boba': '#A0826D',
+        'Matcha': '#6B5444',
+        'Energy Drink': '#C9A882',
+        'Other': '#B8956A'
     };
     
     const backgroundColors = labels.map(label => colors[label] || '#cbd5e1');
@@ -791,8 +791,8 @@ function updateMonthlyChart(drinks) {
             datasets: [{
                 label: 'Drinks',
                 data: data,
-                backgroundColor: '#2563eb',
-                borderColor: '#1e40af',
+                backgroundColor: '#8B7355',
+                borderColor: '#6B5444',
                 borderWidth: 2,
                 borderRadius: 6
             }]

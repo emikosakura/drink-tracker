@@ -63,6 +63,29 @@
                             <datalist id="items-list"></datalist>
                         </div>
 
+                        <!-- Toppings field for boba only -->
+                        <div class="form-group conditional-field" id="toppings-field" style="display: none;">
+                            <label>Toppings</label>
+                            <div class="toppings-container">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="topping-boba" value="boba">
+                                    <span>Boba</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="topping-jelly" value="jelly">
+                                    <span>Jelly</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="topping-other" value="other">
+                                    <span>Other</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="topping-none" value="none">
+                                    <span>No Topping</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- Fields for energy drink -->
                         <div class="form-group conditional-field" id="brand-field" style="display: none;">
                             <label for="drink-brand">Brand</label>
@@ -160,6 +183,97 @@
                 </section>
             </div>
         </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Drink</h2>
+                <button class="modal-close" aria-label="Close">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-drink-id">
+                
+                <div class="form-group">
+                    <label for="edit-drink-type">Drink Type</label>
+                    <select id="edit-drink-type" required disabled>
+                        <option value="boba">Boba</option>
+                        <option value="energy-drink">Energy Drink</option>
+                        <option value="matcha">Matcha</option>
+                        <option value="coffee">Coffee</option>  
+                        <option value="other">Other</option>
+                    </select>
+                    <p class="form-note">Type cannot be changed</p>
+                </div>
+
+                <!-- Fields for boba, matcha, coffee, other -->
+                <div class="form-group" id="edit-place-field" style="display: none;">
+                    <label for="edit-drink-place">Place</label>
+                    <input 
+                        type="text" 
+                        id="edit-drink-place" 
+                        placeholder="Enter place name..."
+                    />
+                </div>
+
+                <div class="form-group" id="edit-item-field" style="display: none;">
+                    <label for="edit-drink-item">Drink</label>
+                    <input 
+                        type="text" 
+                        id="edit-drink-item" 
+                        placeholder="What did you get?"
+                    />
+                </div>
+
+                <!-- Toppings field for boba only -->
+                <div class="form-group" id="edit-toppings-field" style="display: none;">
+                    <label>Toppings</label>
+                    <div class="toppings-container">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="edit-topping-boba" value="boba">
+                            <span>Boba</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="edit-topping-jelly" value="jelly">
+                            <span>Jelly</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="edit-topping-other" value="other">
+                            <span>Other</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="edit-topping-none" value="none">
+                            <span>No Topping</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Fields for energy drink -->
+                <div class="form-group" id="edit-brand-field" style="display: none;">
+                    <label for="edit-drink-brand">Brand</label>
+                    <input 
+                        type="text" 
+                        id="edit-drink-brand" 
+                        placeholder="Enter brand name..."
+                    />
+                </div>
+
+                <div class="form-group" id="edit-flavor-field" style="display: none;">
+                    <label for="edit-drink-flavor">Flavor</label>
+                    <input 
+                        type="text" 
+                        id="edit-drink-flavor" 
+                        placeholder="Enter flavor..."
+                    />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="cancel-edit-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

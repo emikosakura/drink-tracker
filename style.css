@@ -226,6 +226,53 @@ main {
     appearance: none;
 }
 
+/* Toppings Checkboxes */
+.toppings-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    min-height: 48px;
+}
+
+.checkbox-label:hover {
+    background: #f0f0f0;
+    border-color: #c0c0c0;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #8B7355;
+    flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span {
+    font-weight: 600;
+    color: #8B7355;
+}
+
+.checkbox-label span {
+    font-size: 0.95rem;
+    color: #333;
+    transition: all 0.2s ease;
+}
+
 .btn-primary {
     width: 100%;
     padding: 16px;
@@ -494,6 +541,13 @@ main {
     margin-bottom: 4px;
 }
 
+.drink-toppings {
+    font-size: 0.85rem;
+    color: #8B7355;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
 .drink-details {
     font-size: 0.9rem;
     color: #666;
@@ -506,10 +560,35 @@ main {
     flex-shrink: 0;
 }
 
-.drink-time {
-    font-size: 0.8rem;
-    color: #999;
-    white-space: nowrap;
+.edit-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.edit-btn:active {
+    background: rgba(139, 115, 85, 0.1);
+    transform: scale(0.9);
+}
+
+.edit-icon {
+    font-size: 1.2rem;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.edit-btn:active .edit-icon {
+    opacity: 1;
 }
 
 .delete-btn {
@@ -541,6 +620,121 @@ main {
 
 .delete-btn:active .delete-icon {
     opacity: 1;
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px 16px 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #2d3142;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+#edit-form {
+    padding: 20px;
+}
+
+#edit-form .form-group {
+    margin-bottom: 18px;
+}
+
+.form-note {
+    font-size: 0.85rem;
+    color: #999;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 14px;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+.modal-actions .btn-primary {
+    flex: 1;
 }
 
 .empty-state {
@@ -654,6 +848,14 @@ main {
     }
 
     .delete-btn:hover .delete-icon {
+        opacity: 1;
+    }
+
+    .edit-btn:hover {
+        background: rgba(139, 115, 85, 0.1);
+    }
+
+    .edit-btn:hover .edit-icon {
         opacity: 1;
     }
 }

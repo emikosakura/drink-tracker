@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const drinkTypeSelect = document.getElementById('drink-type');
     const placeField = document.getElementById('place-field');
     const itemField = document.getElementById('item-field');
+    const toppingsField = document.getElementById('toppings-field');
     const brandField = document.getElementById('brand-field');
     const flavorField = document.getElementById('flavor-field');
     const submitBtn = document.getElementById('submit-btn');
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hide all conditional fields first
         placeField.style.display = 'none';
         itemField.style.display = 'none';
+        toppingsField.style.display = 'none';
         brandField.style.display = 'none';
         flavorField.style.display = 'none';
         submitBtn.style.display = 'none';
@@ -66,8 +68,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     drinkBrandInput.focus();
                 }, 100);
+            } else if (selectedType === 'boba') {
+                // Show place, drink, and toppings fields for boba
+                placeField.style.display = 'block';
+                itemField.style.display = 'block';
+                toppingsField.style.display = 'block';
+                drinkPlaceInput.setAttribute('required', 'required');
+                drinkItemInput.setAttribute('required', 'required');
+                
+                // Focus on place input
+                setTimeout(() => {
+                    drinkPlaceInput.focus();
+                }, 100);
             } else {
-                // Show place and drink fields for boba, matcha, coffee, other
+                // Show place and drink fields for matcha, coffee, other (no toppings)
                 placeField.style.display = 'block';
                 itemField.style.display = 'block';
                 drinkPlaceInput.setAttribute('required', 'required');
@@ -83,6 +97,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Handle toppings checkboxes logic
+    const toppingNone = document.getElementById('topping-none');
+    const toppingBoba = document.getElementById('topping-boba');
+    const toppingJelly = document.getElementById('topping-jelly');
+    const toppingOther = document.getElementById('topping-other');
+
+    // When "No Topping" is checked, uncheck all others
+    toppingNone.addEventListener('change', function() {
+        if (this.checked) {
+            toppingBoba.checked = false;
+            toppingJelly.checked = false;
+            toppingOther.checked = false;
+        }
+    });
+
+    // When any topping is checked, uncheck "No Topping"
+    [toppingBoba, toppingJelly, toppingOther].forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                toppingNone.checked = false;
+            }
+        });
+    });
+
     // Drink form handling
     const drinkForm = document.getElementById('drink-form');
     drinkForm.addEventListener('submit', function(e) {
@@ -95,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const drinkFlavor = drinkFlavorInput.value.trim();
             
             if (drinkType && drinkBrand && drinkFlavor) {
-                addDrink(drinkType, null, null, drinkBrand, drinkFlavor);
+                addDrink(drinkType, null, null, drinkBrand, drinkFlavor, null);
                 drinkForm.reset();
                 // Hide conditional fields after reset
                 brandField.style.display = 'none';
@@ -110,12 +148,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const drinkPlace = drinkPlaceInput.value.trim();
             const drinkItem = drinkItemInput.value.trim();
             
+            // Get toppings for boba drinks
+            let toppings = null;
+            if (drinkType === 'boba') {
+                const selectedToppings = [];
+                if (toppingBoba.checked) selectedToppings.push('Boba');
+                if (toppingJelly.checked) selectedToppings.push('Jelly');
+                if (toppingOther.checked) selectedToppings.push('Other');
+                if (toppingNone.checked) selectedToppings.push('None');
+                toppings = selectedToppings.length > 0 ? selectedToppings : null;
+            }
+            
             if (drinkType && drinkPlace && drinkItem) {
-                addDrink(drinkType, drinkPlace, drinkItem, null, null);
+                addDrink(drinkType, drinkPlace, drinkItem, null, null, toppings);
                 drinkForm.reset();
                 // Hide conditional fields after reset
                 placeField.style.display = 'none';
                 itemField.style.display = 'none';
+                toppingsField.style.display = 'none';
                 submitBtn.style.display = 'none';
                 drinkPlaceInput.removeAttribute('required');
                 drinkItemInput.removeAttribute('required');
@@ -150,7 +200,7 @@ function saveDrinks(drinks) {
     localStorage.setItem('drinks', JSON.stringify(drinks));
 }
 
-function addDrink(type, place, item, brand, flavor) {
+function addDrink(type, place, item, brand, flavor, toppings) {
     const drinks = getDrinks();
     const newDrink = {
         id: Date.now(),
@@ -166,6 +216,11 @@ function addDrink(type, place, item, brand, flavor) {
         // Normalize place and item to title case for consistency
         newDrink.place = place ? toTitleCase(place.trim()) : place;
         newDrink.item = item ? item.trim() : item;
+        
+        // Add toppings for boba drinks
+        if (type === 'boba' && toppings) {
+            newDrink.toppings = toppings;
+        }
     }
     
     drinks.unshift(newDrink);
@@ -388,6 +443,12 @@ function loadDrinks() {
                     drinkName = `Size: ${drink.size}`;
                 }
             }
+            
+            // Format toppings for boba drinks
+            let toppingsDisplay = '';
+            if (drink.type === 'boba' && drink.toppings && drink.toppings.length > 0) {
+                toppingsDisplay = `<div class="drink-toppings">Toppings: ${drink.toppings.join(', ')}</div>`;
+            }
 
             html += `
                 <div class="drink-item" data-drink-id="${drink.id}">
@@ -395,10 +456,13 @@ function loadDrinks() {
                         <div class="drink-type">${mainTitle}</div>
                         ${placeOrBrand ? `<div class="drink-place-brand"><strong>${placeOrBrand}</strong></div>` : ''}
                         ${drinkName ? `<div class="drink-name">${drinkName}</div>` : ''}
+                        ${toppingsDisplay}
                         <div class="drink-details">${dateString}</div>
                     </div>
                     <div class="drink-meta">
-                        <div class="drink-time">${timeString}</div>
+                        <button class="edit-btn" data-drink-id="${drink.id}" aria-label="Edit drink">
+                            <span class="edit-icon">✏️</span>
+                        </button>
                         <button class="delete-btn" data-drink-id="${drink.id}" aria-label="Delete drink">
                             <span class="delete-icon">🗑️</span>
                         </button>
@@ -419,6 +483,16 @@ function loadDrinks() {
             if (confirm('Are you sure you want to delete this drink?')) {
                 deleteDrink(drinkId);
             }
+        });
+    });
+
+    // Add event listeners to edit buttons
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const drinkId = parseInt(this.getAttribute('data-drink-id'));
+            openEditModal(drinkId);
         });
     });
 }
@@ -894,3 +968,154 @@ function formatDate(date) {
         year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
     });
 }
+
+
+// Edit Modal Functionality
+const editModal = document.getElementById('edit-modal');
+const editForm = document.getElementById('edit-form');
+const modalClose = document.querySelector('.modal-close');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+// Edit toppings checkboxes
+const editToppingBoba = document.getElementById('edit-topping-boba');
+const editToppingJelly = document.getElementById('edit-topping-jelly');
+const editToppingOther = document.getElementById('edit-topping-other');
+const editToppingNone = document.getElementById('edit-topping-none');
+
+// Handle edit toppings checkboxes logic
+editToppingNone.addEventListener('change', function() {
+    if (this.checked) {
+        editToppingBoba.checked = false;
+        editToppingJelly.checked = false;
+        editToppingOther.checked = false;
+    }
+});
+
+[editToppingBoba, editToppingJelly, editToppingOther].forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            editToppingNone.checked = false;
+        }
+    });
+});
+
+function openEditModal(drinkId) {
+    const drinks = getDrinks();
+    const drink = drinks.find(d => d.id === drinkId);
+    
+    if (!drink) return;
+    
+    // Set drink ID
+    document.getElementById('edit-drink-id').value = drinkId;
+    
+    // Set drink type (disabled)
+    document.getElementById('edit-drink-type').value = drink.type;
+    
+    // Hide all fields first
+    document.getElementById('edit-place-field').style.display = 'none';
+    document.getElementById('edit-item-field').style.display = 'none';
+    document.getElementById('edit-toppings-field').style.display = 'none';
+    document.getElementById('edit-brand-field').style.display = 'none';
+    document.getElementById('edit-flavor-field').style.display = 'none';
+    
+    // Reset checkboxes
+    editToppingBoba.checked = false;
+    editToppingJelly.checked = false;
+    editToppingOther.checked = false;
+    editToppingNone.checked = false;
+    
+    // Show relevant fields based on drink type
+    if (drink.type === 'energy-drink') {
+        document.getElementById('edit-brand-field').style.display = 'block';
+        document.getElementById('edit-flavor-field').style.display = 'block';
+        document.getElementById('edit-drink-brand').value = drink.brand || '';
+        document.getElementById('edit-drink-flavor').value = drink.flavor || '';
+    } else {
+        document.getElementById('edit-place-field').style.display = 'block';
+        document.getElementById('edit-item-field').style.display = 'block';
+        document.getElementById('edit-drink-place').value = drink.place || '';
+        document.getElementById('edit-drink-item').value = drink.item || '';
+        
+        // Show toppings for boba
+        if (drink.type === 'boba') {
+            document.getElementById('edit-toppings-field').style.display = 'block';
+            
+            // Set toppings checkboxes
+            if (drink.toppings) {
+                drink.toppings.forEach(topping => {
+                    if (topping === 'Boba') editToppingBoba.checked = true;
+                    if (topping === 'Jelly') editToppingJelly.checked = true;
+                    if (topping === 'Other') editToppingOther.checked = true;
+                    if (topping === 'None') editToppingNone.checked = true;
+                });
+            }
+        }
+    }
+    
+    // Show modal
+    editModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditModal() {
+    editModal.style.display = 'none';
+    document.body.style.overflow = '';
+    editForm.reset();
+}
+
+// Close modal on X button
+modalClose.addEventListener('click', closeEditModal);
+
+// Close modal on cancel button
+cancelEditBtn.addEventListener('click', closeEditModal);
+
+// Close modal on outside click
+editModal.addEventListener('click', function(e) {
+    if (e.target === editModal) {
+        closeEditModal();
+    }
+});
+
+// Handle edit form submission
+editForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const drinkId = parseInt(document.getElementById('edit-drink-id').value);
+    const drinks = getDrinks();
+    const drinkIndex = drinks.findIndex(d => d.id === drinkId);
+    
+    if (drinkIndex === -1) return;
+    
+    const drink = drinks[drinkIndex];
+    const drinkType = drink.type;
+    
+    // Update fields based on drink type
+    if (drinkType === 'energy-drink') {
+        drink.brand = document.getElementById('edit-drink-brand').value.trim();
+        drink.flavor = document.getElementById('edit-drink-flavor').value.trim();
+    } else {
+        drink.place = toTitleCase(document.getElementById('edit-drink-place').value.trim());
+        drink.item = document.getElementById('edit-drink-item').value.trim();
+        
+        // Update toppings for boba
+        if (drinkType === 'boba') {
+            const selectedToppings = [];
+            if (editToppingBoba.checked) selectedToppings.push('Boba');
+            if (editToppingJelly.checked) selectedToppings.push('Jelly');
+            if (editToppingOther.checked) selectedToppings.push('Other');
+            if (editToppingNone.checked) selectedToppings.push('None');
+            drink.toppings = selectedToppings.length > 0 ? selectedToppings : null;
+        }
+    }
+    
+    // Save updated drinks
+    saveDrinks(drinks);
+    loadDrinks();
+    updateStats();
+    updatePlacesList();
+    updateItemsList();
+    updateBrandsList();
+    updateFlavorsList();
+    
+    closeEditModal();
+});

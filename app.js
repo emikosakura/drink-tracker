@@ -160,11 +160,12 @@ function addDrink(type, place, item, brand, flavor) {
     
     // Add fields based on drink type
     if (type === 'energy-drink') {
-        newDrink.brand = brand;
-        newDrink.flavor = flavor;
+        newDrink.brand = brand ? brand.trim() : brand;
+        newDrink.flavor = flavor ? flavor.trim() : flavor;
     } else {
-        newDrink.place = place;
-        newDrink.item = item;
+        // Normalize place and item to title case for consistency
+        newDrink.place = place ? toTitleCase(place.trim()) : place;
+        newDrink.item = item ? item.trim() : item;
     }
     
     drinks.unshift(newDrink);
@@ -183,19 +184,33 @@ function addDrink(type, place, item, brand, flavor) {
     }
 }
 
+// Helper function to convert text to title case
+function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
+// Helper function to capitalize first letter only
+function capitalize(str) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Get unique places from all drinks
 function getUniquePlaces() {
     const drinks = getDrinks();
-    const places = new Set();
+    const placesMap = new Map();
     
     drinks.forEach(drink => {
         // Handle both old data (size) and new data (place)
         if (drink.place) {
-            places.add(drink.place.trim());
+            const normalizedPlace = toTitleCase(drink.place.trim());
+            placesMap.set(normalizedPlace.toLowerCase(), normalizedPlace);
         }
     });
     
-    return Array.from(places).sort();
+    return Array.from(placesMap.values()).sort();
 }
 
 // Update the autocomplete datalist with unique places
@@ -362,12 +377,12 @@ function loadDrinks() {
             
             if (drink.type === 'energy-drink') {
                 // For energy drinks, show brand (bold) and flavor below
-                placeOrBrand = drink.brand || '';
-                drinkName = drink.flavor || '';
+                placeOrBrand = drink.brand ? toTitleCase(drink.brand) : '';
+                drinkName = drink.flavor ? toTitleCase(drink.flavor) : '';
             } else {
                 // For other drinks, show place (bold) and drink item below
-                placeOrBrand = drink.place || '';
-                drinkName = drink.item || '';
+                placeOrBrand = drink.place ? toTitleCase(drink.place) : '';
+                drinkName = drink.item ? toTitleCase(drink.item) : '';
                 // Handle legacy data
                 if (!drink.item && !drink.place && drink.size) {
                     drinkName = `Size: ${drink.size}`;
@@ -533,8 +548,8 @@ function getPlacesVisited(drinks) {
     drinks.forEach(drink => {
         // Only count drinks with places (not energy drinks)
         if (drink.place && drink.type !== 'energy-drink') {
-            const place = drink.place.trim();
-            placeCounts[place] = (placeCounts[place] || 0) + 1;
+            const normalizedPlace = toTitleCase(drink.place.trim());
+            placeCounts[normalizedPlace] = (placeCounts[normalizedPlace] || 0) + 1;
         }
     });
     

@@ -4,8 +4,8 @@
   "description": "Track your daily beverages including coffee, boba, matcha, energy drinks, and more",
   "start_url": "/drink-tracker/",
   "display": "standalone",
-  "background_color": "#2563eb",
-  "theme_color": "#2563eb",
+  "background_color": "#5D4E37",
+  "theme_color": "#5D4E37",
   "orientation": "portrait",
   "scope": "/",
   "icons": [
